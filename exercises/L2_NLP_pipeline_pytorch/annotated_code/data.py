@@ -44,16 +44,14 @@ class Corpus(object):
             ###############################################################################
             for line in f:
                 words = line.split() + ['<eos>']
-                ids = []
-                for word in words:
-                    ids.append(self.dictionary.word2idx[word])
+                ids = [self.dictionary.word2idx[word] for word in words]
                 idss.append(torch.tensor(ids).type(torch.int64))
             ids = torch.cat(idss)
 
-            ###############################################################################
-            # 构建输出, sst2的label取出, positive的label为1, negative的label为0, 返回格式为多行(ids, label)
-            ###############################################################################
-        
+                ###############################################################################
+                # 构建输出, sst2的label取出, positive的label为1, negative的label为0, 返回格式为多行(ids, label)
+                ###############################################################################
+
         ###############################################################################
         # sst2语料库 
         # The dinner is great. \t positive

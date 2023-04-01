@@ -113,13 +113,13 @@ def qa_f1_score(prediction, ground_truth):
         return 0
     precision = 1.0 * num_same / len(prediction_tokens)
     recall = 1.0 * num_same / len(ground_truth_tokens)
-    f1 = (2 * precision * recall) / (precision + recall)
-    return f1
+    return (2 * precision * recall) / (precision + recall)
 
 def get_token_f1(predictions, groud_truths):
-    f1s = []
-    for (prediction, dp) in zip(predictions, groud_truths):
-        f1s.append(qa_f1_score(prediction, dp))
+    f1s = [
+        qa_f1_score(prediction, dp)
+        for prediction, dp in zip(predictions, groud_truths)
+    ]
     return np.mean(f1s)
 
 
@@ -134,7 +134,7 @@ def evaluate(prompt_model, dataloader, args):
     ground_truths = []
     print("begin evaluation")
 
-    for step, inputs in enumerate(dataloader):
+    for inputs in dataloader:
         inputs = inputs.cuda()
         _, output_sentence = prompt_model.generate(inputs, **generation_arguments, verbose=False)
         predictions.extend(output_sentence)
@@ -143,10 +143,7 @@ def evaluate(prompt_model, dataloader, args):
     print(f"predictions {predictions[0]}, ground_truths {ground_truths[0]}")
     predictions = [prediction.strip() for prediction in predictions]
     ground_truths = [ground_truth.strip() for ground_truth in ground_truths]
-    # shown one example
-
-    score = get_token_f1(predictions, ground_truths)
-    return score
+    return get_token_f1(predictions, ground_truths)
 
 
 def main(args):
@@ -199,8 +196,7 @@ def main(args):
 
     for epoch in range(args.train_epochs):
         pbar = tqdm(train_dataloader, desc=f"Epoch{epoch}")
-        for step, inputs in enumerate(pbar):
-
+        for inputs in pbar:
             #############################################################
             ## Complete the training loop using pytorch style
             ##
@@ -253,7 +249,7 @@ def get_generated_sequence(prompt_model, dataloader, args):
     predictions = []
     print("begin evaluation")
 
-    for step, inputs in enumerate(dataloader):
+    for inputs in dataloader:
         inputs = inputs.cuda()
         _, output_sentence = prompt_model.generate(inputs, **generation_arguments, verbose=False)
         predictions.extend(output_sentence)
